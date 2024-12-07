@@ -28,6 +28,13 @@ curl --location 'http://127.0.0.1:8000/receive' \
 
 ```key -> base64(encrypt_pub_key(simetric_key))``
 
+- Check key from uuid
+
+```bash
+curl --location 'http://127.0.0.1:8000/key?uuid=a14ad9c5-9351-4102-b044-9b855c2d5d41' \
+--header 'api-key: secretkey'
+```
+
 ## Encrypt and Decrypt
 
 ```python
