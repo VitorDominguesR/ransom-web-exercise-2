@@ -100,7 +100,7 @@ def recieve_private_key(request):
             cipher_decrypt_key = cipher.decrypt(encrypted_sim_key)
             return JsonResponse({"sim_key": cipher_decrypt_key.decode(encoding='utf8')})
         
-        
+    return HttpResponseNotFound("Not Found")
         
     
 
