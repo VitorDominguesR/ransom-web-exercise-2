@@ -7,3 +7,6 @@ class Keys(models.Model):
     encrypted_symetric_key = models.BinaryField(blank=True)
     paid_status=models.BooleanField(default=False)
     unique_email_token=models.CharField(max_length=200, blank=True)
+    
+    def __str__(self):
+        return str(self.uuid_compromised_pc)
