@@ -98,7 +98,7 @@ def recieve_private_key(request):
                 rsa_key = RSA.importKey(private_rsa_key)
                 cipher = PKCS1_OAEP.new(rsa_key)
                 cipher_decrypt_key = cipher.decrypt(encrypted_sim_key)
-                return JsonResponse({"sim_key": cipher_decrypt_key.decode(encoding='utf8')})
+                return JsonResponse({"sim_key": b64encode(cipher_decrypt_key).decode("utf-8")})
         except:
             return HttpResponseNotFound("Error on getting the simmetric key")
         
