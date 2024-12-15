@@ -1,3 +1,6 @@
+{% load static %}
+
+
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -19,14 +22,42 @@
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/Content/ico/icon-114.png">
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/Content/ico/icon-72.png">
     <link rel="apple-touch-icon-precomposed" href="/Content/ico/icon-57.png">
+     <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .logo {
+            max-width: 300px;
+            margin-bottom: 30px;
+        }
+        .download-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .download-list li {
+            margin: 10px 0;
+        }
+        .download-list a {
+            text-decoration: none;
+            color: #0056b3;
+        }
+        .download-list a:hover {
+            text-decoration: underline;
+        }
+    </style>
 
 </head>
 
 <body>
+	<img src="{% static 'images/logo_isep.png' %}" alt="Logo ISEP" class="logo">
 
-    <div>
-        <a href="http://127.0.0.1:8000/media/IsepNetworkInstaller" download>Click here to download</a>
-    </div>
+	<ul class="download-list">
+    
+		<li><a href="http://127.0.0.1:8000/media/IsepNetworkInstaller" download>Click here to download the VPN Installer</a></li>
+	</ul>
+    
 
 
 </body>
